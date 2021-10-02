@@ -1,6 +1,6 @@
 import Card from "./Card";
 import "./Deck.css"
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import axios from "axios";
 
 
@@ -9,6 +9,9 @@ const Deck = () => {
     const [deck, setDeck] = useState([])
     const [deckId, setDeckId] = useState()
     const [cardsRemaining, setCardsRemaining] = useState(true)
+    const [drawing, setDrawing] = useState(false)
+    const timerId = useRef();
+
     useEffect(function getDeck(){
         async function fetchDeck(){
             const res = await axios.get(BASE_URL + 'new/shuffle/?deck_count=1')
@@ -17,6 +20,17 @@ const Deck = () => {
         }
         fetchDeck()
     }, [])
+
+    useEffect(function setDrawTimer(){
+        timerId.current = setInterval( async () => {
+            if(drawing){
+                await drawCard();    
+            }
+        }, 1000)
+        return function cleanUpClearTimer() {
+            clearInterval(timerId.current);
+        };
+    }, [timerId, drawing, deck])
 
     const drawCard = async () => {
         if(deck.length < 52){
@@ -28,12 +42,17 @@ const Deck = () => {
         }else{
             setCardsRemaining(false)
             console.log("ERROR: NO CARDS REMAING!")
+            setDrawing(false)
         }
+    }
+
+    const handleClick = () => {
+        setDrawing(!drawing);
     }
 
     return(
         <>
-        {(cardsRemaining) ? <button className="Deck-btn" onClick={drawCard}>Draw Card</button> : ""}
+        {(cardsRemaining) ? <button className="Deck-btn" onClick={handleClick}>{(drawing) ? "Stop Drawing" : "Start Drawing"}</button> : ""}
         
         <div className="Deck-stack">
         {deck.map(c => (<Card 
