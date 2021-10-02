@@ -1,0 +1,13 @@
+.Deck-stack {
+    margin-top: 10%;
+    display: flex;
+    justify-content: center;
+}
+
+.Deck-btn {
+    padding: 5vh;
+    padding-top: 3vh;
+    padding-bottom: 3vh;
+    border-radius: 10%;
+    background-color: gray;
+}
